@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
 
 export default async function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params
@@ -34,12 +35,25 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
   return (
     <main className="min-h-screen bg-black px-4 py-12">
       <div className="max-w-lg mx-auto">
-        <h1 className="text-2xl font-serif text-white mb-1">{'@' + profile.username}</h1>
-        <p className="text-sm text-neutral-500 mb-10">a quiet space</p>
+        <div className="flex justify-between items-start mb-10">
+          <div>
+            <h1 className="text-2xl font-serif text-white mb-1">{'@' + profile.username}</h1>
+            <p className="text-sm text-neutral-500">a quiet space</p>
+          </div>
+          <Link
+            href="/login"
+            className="text-sm px-4 py-2 rounded-lg border border-neutral-800 text-white hover:bg-neutral-900 transition"
+          >
+            Log in
+          </Link>
+        </div>
 
         {pinned ? (
           <div className="mb-8 border border-indigo-500 rounded-lg p-4">
             <span className="text-xs text-indigo-400 mb-2 block">Pinned</span>
+            {pinned.title ? (
+              <p className="text-white font-semibold text-center mb-2">{pinned.title}</p>
+            ) : null}
             <p className="text-white whitespace-pre-wrap leading-relaxed font-serif text-lg">
               {pinned.content}
             </p>
@@ -54,6 +68,9 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
             rest.map(function (t) {
               return (
                 <div key={t.id} className="border-b border-neutral-800 pb-6">
+                  {t.title ? (
+                    <p className="text-white font-semibold text-center mb-2">{t.title}</p>
+                  ) : null}
                   <p className="text-white whitespace-pre-wrap leading-relaxed font-serif text-lg">
                     {t.content}
                   </p>

@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 type Profile = { id: string; username: string }
-type Thought = { id: string; content: string; created_at: string; pinned: boolean; archived: boolean }
+type Thought = { id: string; title: string | null; content: string; created_at: string; pinned: boolean; archived: boolean }
 
 export default function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [thoughts, setThoughts] = useState<Thought[]>([])
+  const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [copied, setCopied] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -56,11 +57,16 @@ export default function DashboardPage() {
     if (!content.trim() || !profile) return
     const result = await supabase
       .from('thoughts')
-      .insert({ profile_id: profile.id, content: content.trim() })
+      .insert({
+        profile_id: profile.id,
+        title: title.trim() ? title.trim() : null,
+        content: content.trim(),
+      })
       .select()
       .single()
     if (!result.error && result.data) {
       setThoughts([result.data, ...thoughts])
+      setTitle('')
       setContent('')
     }
   }
@@ -155,16 +161,19 @@ export default function DashboardPage() {
             </button>
 
             {settingsOpen ? (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-neutral-900 border border-neutral-800 rounded-lg shadow-lg overflow-hidden z-10">
-                <a
-                  href="mailto:your-email@example.com"
-                  className="block px-4 py-3 text-sm text-neutral-300 hover:bg-neutral-800 transition"
-                >
-                  Help
-                </a>
+              <div className="absolute right-0 top-full mt-2 w-56 bg-neutral-900 border border-neutral-800 rounded-lg shadow-lg overflow-hidden z-10">
+                <div className="px-4 py-3 border-b border-neutral-800">
+                  <p className="text-xs text-neutral-500 mb-2 uppercase tracking-wider font-semibold">Help</p>
+                  <div className="space-y-1 text-xs text-neutral-400 break-all">
+                    <p>Email: fardinahmedxd@gmail.com</p>
+                    <p>WhatsApp: 601128578754</p>
+                    <p>Discord: fardin_007</p>
+                    <p>Telegram: fardin_0069</p>
+                  </div>
+                </div>
                 <button
                   onClick={signOut}
-                  className="block w-full text-left px-4 py-3 text-sm text-neutral-300 hover:bg-neutral-800 transition border-t border-neutral-800"
+                  className="block w-full text-left px-4 py-3 text-sm text-neutral-300 hover:bg-neutral-800 transition"
                 >
                   Sign out
                 </button>
@@ -187,6 +196,15 @@ export default function DashboardPage() {
         </button>
 
         <div className="mb-8">
+          <input
+            type="text"
+            value={title}
+            onChange={function (e) {
+              setTitle(e.target.value)
+            }}
+            placeholder="Header (optional)"
+            className="w-full px-4 py-2 rounded-lg border border-neutral-800 bg-neutral-900 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-2"
+          />
           <textarea
             value={content}
             onChange={function (e) {
@@ -229,6 +247,9 @@ export default function DashboardPage() {
               <div key={t.id} className="group bg-neutral-900 rounded-lg border border-neutral-800 p-4">
                 {t.pinned ? (
                   <span className="text-xs text-indigo-400 mb-2 block">Pinned</span>
+                ) : null}
+                {t.title ? (
+                  <p className="text-white font-semibold mb-1">{t.title}</p>
                 ) : null}
                 <p className="text-white whitespace-pre-wrap">{t.content}</p>
                 <div className="flex justify-between items-center mt-3">
