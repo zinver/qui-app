@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { linkify } from '@/lib/linkify'
 
 export default async function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params
@@ -55,7 +56,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
               <p className="text-white font-semibold text-center mb-2">{pinned.title}</p>
             ) : null}
             <p className="text-white whitespace-pre-wrap leading-relaxed font-serif text-lg">
-              {pinned.content}
+              {linkify(pinned.content)}
             </p>
             <span className="text-xs text-neutral-500 mt-3 block">
               {new Date(pinned.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -72,7 +73,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
                     <p className="text-white font-semibold text-center mb-2">{t.title}</p>
                   ) : null}
                   <p className="text-white whitespace-pre-wrap leading-relaxed font-serif text-lg">
-                    {t.content}
+                    {linkify(t.content)}
                   </p>
                   <span className="text-xs text-neutral-500 mt-3 block">
                     {new Date(t.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}

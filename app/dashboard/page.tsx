@@ -1,8 +1,10 @@
 'use client'
 
+
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { linkify } from '@/lib/linkify'
 
 type Profile = { id: string; username: string }
 type Thought = { id: string; title: string | null; content: string; created_at: string; pinned: boolean; archived: boolean }
@@ -251,7 +253,7 @@ export default function DashboardPage() {
                 {t.title ? (
                   <p className="text-white font-semibold mb-1">{t.title}</p>
                 ) : null}
-                <p className="text-white whitespace-pre-wrap">{t.content}</p>
+                <p className="text-white whitespace-pre-wrap">{linkify(t.content)}</p>
                 <div className="flex justify-between items-center mt-3">
                   <span className="text-xs text-neutral-500">
                     {new Date(t.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
