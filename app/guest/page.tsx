@@ -7,6 +7,7 @@ export default function GuestPage() {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const [tab, setTab] = useState('active')
   const router = useRouter()
 
@@ -117,32 +118,52 @@ export default function GuestPage() {
 
         <div className="space-y-4">
           {tab === 'active' ? (
-            <div className="group bg-neutral-900 rounded-lg border border-neutral-800 p-4">
-              <p className="text-white font-semibold mb-1">{demoThought.title}</p>
-              <p className="text-white whitespace-pre-wrap">{demoThought.content}</p>
-              <div className="flex justify-between items-center mt-3">
-                <span className="text-xs text-neutral-500">{demoThought.date}</span>
-                <div className="flex gap-3">
+            <div className="relative bg-neutral-900 rounded-lg border border-neutral-800 p-4">
+              <div className="flex justify-between items-start mb-1">
+                <p className="text-white font-semibold">{demoThought.title}</p>
+
+                <div className="relative">
                   <button
-                    onClick={requireLogin}
-                    className="text-xs text-neutral-400 hover:text-indigo-400 transition"
+                    onClick={function () {
+                      setMenuOpen(!menuOpen)
+                    }}
+                    className="p-1 text-neutral-400 hover:text-white transition"
+                    aria-label="Post options"
                   >
-                    Pin
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                      <circle cx="12" cy="5" r="1.5" />
+                      <circle cx="12" cy="12" r="1.5" />
+                      <circle cx="12" cy="19" r="1.5" />
+                    </svg>
                   </button>
-                  <button
-                    onClick={requireLogin}
-                    className="text-xs text-neutral-400 hover:text-white transition"
-                  >
-                    Archive
-                  </button>
-                  <button
-                    onClick={requireLogin}
-                    className="text-xs text-red-400 opacity-0 group-hover:opacity-100 transition"
-                  >
-                    Delete
-                  </button>
+
+                  {menuOpen ? (
+                    <div className="absolute right-0 top-full mt-1 w-36 bg-neutral-900 border border-neutral-800 rounded-lg shadow-lg overflow-hidden z-10">
+                      <button
+                        onClick={requireLogin}
+                        className="block w-full text-left px-3 py-2 text-xs text-neutral-300 hover:bg-neutral-800 transition"
+                      >
+                        Pin
+                      </button>
+                      <button
+                        onClick={requireLogin}
+                        className="block w-full text-left px-3 py-2 text-xs text-neutral-300 hover:bg-neutral-800 transition border-t border-neutral-800"
+                      >
+                        Archive
+                      </button>
+                      <button
+                        onClick={requireLogin}
+                        className="block w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-neutral-800 transition border-t border-neutral-800"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  ) : null}
                 </div>
               </div>
+
+              <p className="text-white whitespace-pre-wrap">{demoThought.content}</p>
+              <span className="text-xs text-neutral-500 mt-3 block">{demoThought.date}</span>
             </div>
           ) : (
             <p className="text-center text-neutral-500 text-sm py-8">Nothing archived.</p>
