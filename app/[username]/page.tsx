@@ -8,7 +8,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
   const supabase = await createClient()
 
   const result1 = await supabase
-    .from('profiles')
+    .from('public_profiles')
     .select('*')
     .eq('username', username)
     .single()
