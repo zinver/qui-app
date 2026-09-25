@@ -1,6 +1,5 @@
 'use client'
 
-
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -16,6 +15,7 @@ export default function DashboardPage() {
   const [content, setContent] = useState('')
   const [copied, setCopied] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [openMenu, setOpenMenu] = useState<string | null>(null)
   const [tab, setTab] = useState('active')
   const router = useRouter()
   const supabase = createClient()
@@ -246,58 +246,84 @@ export default function DashboardPage() {
         <div className="space-y-4">
           {visibleThoughts.map(function (t) {
             return (
-              <div key={t.id} className="group bg-neutral-900 rounded-lg border border-neutral-800 p-4">
-                {t.pinned ? (
-                  <span className="text-xs text-indigo-400 mb-2 block">Pinned</span>
-                ) : null}
-                {t.title ? (
-                  <p className="text-white font-semibold mb-1">{t.title}</p>
-                ) : null}
-                <p className="text-white whitespace-pre-wrap">{linkify(t.content)}</p>
-                <div className="flex justify-between items-center mt-3">
-                  <span className="text-xs text-neutral-500">
-                    {new Date(t.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </span>
-                  <div className="flex gap-3">
-                    {tab === 'active' ? (
-                      <button
-                        onClick={function () {
-                          togglePin(t)
-                        }}
-                        className="text-xs text-neutral-400 hover:text-indigo-400 transition"
-                      >
-                        {t.pinned ? 'Unpin' : 'Pin'}
-                      </button>
+              <div key={t.id} className="relative bg-neutral-900 rounded-lg border border-neutral-800 p-4">
+                <div className="flex justify-between items-start mb-1">
+                  <div>
+                    {t.pinned ? (
+                      <span className="text-xs text-indigo-400 mb-1 block">Pinned</span>
                     ) : null}
-                    {tab === 'active' ? (
-                      <button
-                        onClick={function () {
-                          archiveThought(t.id)
-                        }}
-                        className="text-xs text-neutral-400 hover:text-white transition"
-                      >
-                        Archive
-                      </button>
-                    ) : (
-                      <button
-                        onClick={function () {
-                          unarchiveThought(t.id)
-                        }}
-                        className="text-xs text-neutral-400 hover:text-white transition"
-                      >
-                        Unarchive
-                      </button>
-                    )}
+                    {t.title ? (
+                      <p className="text-white font-semibold">{t.title}</p>
+                    ) : null}
+                  </div>
+
+                  <div className="relative">
                     <button
                       onClick={function () {
-                        deleteThought(t.id)
+                        setOpenMenu(openMenu === t.id ? null : t.id)
                       }}
-                      className="text-xs text-red-400 opacity-0 group-hover:opacity-100 transition"
+                      className="p-1 text-neutral-400 hover:text-white transition"
+                      aria-label="Post options"
                     >
-                      Delete
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <circle cx="12" cy="5" r="1.5" />
+                        <circle cx="12" cy="12" r="1.5" />
+                        <circle cx="12" cy="19" r="1.5" />
+                      </svg>
                     </button>
+
+                    {openMenu === t.id ? (
+                      <div className="absolute right-0 top-full mt-1 w-36 bg-neutral-900 border border-neutral-800 rounded-lg shadow-lg overflow-hidden z-10">
+                        {tab === 'active' ? (
+                          <button
+                            onClick={function () {
+                              togglePin(t)
+                              setOpenMenu(null)
+                            }}
+                            className="block w-full text-left px-3 py-2 text-xs text-neutral-300 hover:bg-neutral-800 transition"
+                          >
+                            {t.pinned ? 'Unpin' : 'Pin'}
+                          </button>
+                        ) : null}
+                        {tab === 'active' ? (
+                          <button
+                            onClick={function () {
+                              archiveThought(t.id)
+                              setOpenMenu(null)
+                            }}
+                            className="block w-full text-left px-3 py-2 text-xs text-neutral-300 hover:bg-neutral-800 transition border-t border-neutral-800"
+                          >
+                            Archive
+                          </button>
+                        ) : (
+                          <button
+                            onClick={function () {
+                              unarchiveThought(t.id)
+                              setOpenMenu(null)
+                            }}
+                            className="block w-full text-left px-3 py-2 text-xs text-neutral-300 hover:bg-neutral-800 transition border-t border-neutral-800"
+                          >
+                            Unarchive
+                          </button>
+                        )}
+                        <button
+                          onClick={function () {
+                            deleteThought(t.id)
+                            setOpenMenu(null)
+                          }}
+                          className="block w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-neutral-800 transition border-t border-neutral-800"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
+
+                <p className="text-white whitespace-pre-wrap">{linkify(t.content)}</p>
+                <span className="text-xs text-neutral-500 mt-3 block">
+                  {new Date(t.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                </span>
               </div>
             )
           })}
